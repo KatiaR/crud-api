@@ -8,7 +8,7 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "start:dev": "nodemon src/server.ts",
-    "start:prod": "npm run build && node build/server.js"
+    "start:prod": "npm run build && node dist/server.js"
   },
   "repository": {
     "type": "git",
