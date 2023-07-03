@@ -1,26 +1,49 @@
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+
 import {
-  isIdValid,
   successfulResponse,
   unsuccessfulResponse,
   validateUserId,
 } from '../utils/util';
 
-export const getUsers = (res, users) => {
-  successfulResponse(res, users);
+const userDir = 'src/users.json';
+
+const getUsersFromFile = () => {
+  const users = fs.readFileSync(userDir, 'utf-8');
+  return JSON.parse(users);
 };
 
-export const getUserById = (users, res, userId) => {
+const updateUserJson = (updatedUsersData) => {
+  try {
+    fs.writeFile(userDir, updatedUsersData, 'utf8', (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+        return;
+      }
+    });
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+  }
+};
+
+export const getUsers = (res) => {
+  const users = fs.readFileSync(userDir, 'utf-8');
+  successfulResponse(res, JSON.parse(users));
+};
+
+export const getUserById = async (res, userId) => {
   validateUserId(res, userId);
-  const user = users.find((user) => user.id === userId);
+  const users = getUsersFromFile();
+  const user = await users.find((user) => user.id === userId);
   if (user) {
-    successfulResponse(res, users);
+    successfulResponse(res, user);
   } else {
     unsuccessfulResponse(res, 404, 'Not Found');
   }
 };
 
-export const createUser = (req, res, users) => {
+export const createUser = (req, res) => {
   let body = '';
 
   req.on('data', (chunk) => {
@@ -41,7 +64,9 @@ export const createUser = (req, res, users) => {
         age: userData.age,
         hobbies: userData.hobbies,
       };
-      users.push(newUser);
+      const users = getUsersFromFile();
+      const updatedUsersData = JSON.stringify([...users, newUser]);
+      updateUserJson(updatedUsersData);
       successfulResponse(res, newUser, 201);
     } catch (error) {
       unsuccessfulResponse(res, 400, 'Invalid request body');
@@ -49,42 +74,20 @@ export const createUser = (req, res, users) => {
   });
 };
 
-export const updateUser = (req, res, users, userId) => {
+export const updateUser = (req, res, userId) => {
   validateUserId(res, userId);
-
-  const userIndex = users.findIndex((user) => user.id === userId);
-
-  if (userIndex !== -1) {
-    let body = '';
-
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-
-    req.on('end', () => {
-      try {
-        const userData = JSON.parse(body);
-        const updatedUser = { ...users[userIndex], ...userData };
-        users[userIndex] = updatedUser;
-        successfulResponse(res, updatedUser);
-      } catch (error) {
-        unsuccessfulResponse(res, 400, 'Invalid request body');
-      }
-    });
-  } else {
-    unsuccessfulResponse(res, 404, 'User not found');
-  }
+  const users = getUsersFromFile();
 };
 
-export const deleteUser = (res, users, userId) => {
+export const deleteUser = (res, userId) => {
   validateUserId(res, userId);
-
+  const users = getUsersFromFile();
   const userIndex = users.findIndex((user) => user.id === userId);
 
   if (userIndex !== -1) {
     users.splice(userIndex, 1);
-    res.writeHead(204);
-    res.end();
+    updateUserJson(JSON.stringify(users));
+    successfulResponse(res, { a: 1 }, 204);
   } else {
     unsuccessfulResponse(res, 404, 'User not found');
   }

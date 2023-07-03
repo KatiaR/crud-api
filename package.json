@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Task is to implement simple CRUD API using in-memory database underneath.",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "node dist/server.js",
     "build": "tsc",
-    "start:dev": "nodemon src/index.ts",
-    "start:prod": "npm run build && node build/index.js"
+    "start:dev": "nodemon src/server.ts",
+    "start:prod": "npm run build && node build/server.js"
   },
   "repository": {
     "type": "git",
