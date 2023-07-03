@@ -1,1 +1,14 @@
-[{"id":"89129754-d9d9-4111-879e-0cda81638ed1","name":"Wae","age":133,"hobbies":["A"]},{"id":"d0606d7b-c85a-40af-80a8-e313f10c4aff","name":"Wadce","age":1333,"hobbies":["A"]}]
+[
+  {
+    "id": "89129754-d9d9-4111-879e-0cda81638ed1",
+    "name": "Mew",
+    "age": "22",
+    "hobbies": ["A"]
+  },
+  {
+    "id": "d0606d7b-c85a-40af-80a8-e313f10c4aff",
+    "name": "Wadce",
+    "age": 1333,
+    "hobbies": ["A"]
+  }
+]

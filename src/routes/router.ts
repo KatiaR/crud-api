@@ -25,7 +25,7 @@ export const userRouter = (req, res) => {
     deleteUser(res, userId);
   } else {
     res.statusCode = 404;
-    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ error: 'Not Found' }));
   }
 };

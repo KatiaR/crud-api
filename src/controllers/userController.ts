@@ -77,6 +77,29 @@ export const createUser = (req, res) => {
 export const updateUser = (req, res, userId) => {
   validateUserId(res, userId);
   const users = getUsersFromFile();
+  const userIndex = users.findIndex((user) => user.id === userId);
+
+  if (userIndex !== -1) {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const userData = JSON.parse(body);
+
+        const users = getUsersFromFile();
+        users[userIndex] = { ...users[userIndex], ...userData };
+        updateUserJson(JSON.stringify(users));
+        successfulResponse(res, { updated: 'yes' }, 200);
+      } catch (error) {
+        unsuccessfulResponse(res, 400, 'Invalid request body');
+      }
+    });
+  } else {
+    unsuccessfulResponse(res, 404, 'User not found');
+  }
 };
 
 export const deleteUser = (res, userId) => {
@@ -87,7 +110,7 @@ export const deleteUser = (res, userId) => {
   if (userIndex !== -1) {
     users.splice(userIndex, 1);
     updateUserJson(JSON.stringify(users));
-    successfulResponse(res, { a: 1 }, 204);
+    successfulResponse(res, { deleted: 1 }, 204);
   } else {
     unsuccessfulResponse(res, 404, 'User not found');
   }
